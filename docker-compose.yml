@@ -1,0 +1,82 @@
+services:
+  database:
+    build:
+      context: ./storage
+      dockerfile: Dockerfile
+    container_name: rps-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rps_db}
+      POSTGRES_USER: ${POSTGRES_USER:-rps_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password123}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rps_user} -d ${POSTGRES_DB:-rps_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - rps-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rps-backend
+    restart: unless-stopped
+    environment:
+      PORT: ${BACKEND_PORT:-4000}
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-rps_user}
+      DB_PASSWORD: ${DB_PASSWORD:-password123}
+      DB_NAME: ${DB_NAME:-rps_db}
+      JWT_SECRET: ${JWT_SECRET:-rps_super_secret_jwt_key_2026_dev}
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:4000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - rps-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rps-frontend
+    restart: unless-stopped
+    environment:
+      PORT: ${FRONTEND_PORT:-3000}
+      BACKEND_URL: http://backend:${BACKEND_PORT:-4000}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+      - "80:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - rps-network
+
+networks:
+  rps-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
