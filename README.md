@@ -129,3 +129,9 @@ To also remove persistent database data:
 ```bash
 docker compose down -v
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+You are free to use, copy, modify, and distribute this project in accordance with the terms of the license.
