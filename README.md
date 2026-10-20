@@ -132,6 +132,8 @@ docker compose down -v
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is a personal portfolio project created to showcase my skills and knowledge in DevOps, infrastructure as code, containerization, orchestration, configuration management, and CI/CD.
+
+It project is licensed under the [MIT License](LICENSE).
 
 You are free to use, copy, modify, and distribute this project in accordance with the terms of the license.
