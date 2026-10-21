@@ -321,7 +321,9 @@ async function playRound(move) {
 
             roundDisplay.innerHTML = `
                 <div class="${resultClass}">
-                    <img src="${imgPath}" alt="${result.result}" class="combat-img">
+                    <div class="combat-img-wrapper">
+                        <img src="${imgPath}" alt="${result.result}" class="combat-img">
+                    </div>
                     <p>PLAYER: <strong>${result.userMove.toUpperCase()}</strong></p>
                     <p>CPU: <strong>${result.cpuMove.toUpperCase()}</strong></p>
                     <h3>${resultText}</h3>
